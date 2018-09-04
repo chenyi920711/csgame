@@ -1,0 +1,97 @@
+<%@ page contentType="text/html;charset=UTF-8" %>
+<%@ include file="/WEB-INF/views/include/taglib.jsp"%>
+<html>
+<head>
+	<title>门店设备管理</title>
+	<meta name="decorator" content="default"/>
+	<script type="text/javascript">
+		$(document).ready(function() {
+			
+		});
+		function page(n,s){
+			$("#pageNo").val(n);
+			$("#pageSize").val(s);
+			$("#searchForm").submit();
+        	return false;
+        }
+
+	</script>
+</head>
+
+<body>
+	<ul class="nav nav-tabs">
+		<li class="active"><a href="${ctx}/equip/equipment/storeEquipment/">门店设备列表</a></li>
+		<shiro:hasPermission name="equip:equipment:storeEquipment:edit"><li><a href="${ctx}/equip/equipment/storeEquipment/form">门店设备添加</a></li></shiro:hasPermission>
+	</ul>
+	<form:form id="searchForm" modelAttribute="storeEquipment" action="${ctx}/equip/equipment/storeEquipment/" method="post" class="breadcrumb form-search">
+		<input id="pageNo" name="pageNo" type="hidden" value="${page.pageNo}"/>
+		<input id="storeNo" name="storeNo"  type="hidden" value="${fns:getUser().company.id}"/>
+		<input id="pageSize" name="pageSize" type="hidden" value="${page.pageSize}"/>
+		<ul class="ul-form">
+			<li><label>设备编号：</label>
+				<form:input path="equipmentno" htmlEscape="false" maxlength="255" class="input-medium"/>
+			</li>
+			<li><label>设备名称：</label>
+				<form:input path="equipmentname" htmlEscape="false" maxlength="255" class="input-medium"/>
+			</li>
+			<%-- <li><label>质保日期：</label>
+				<input name="equipmentdate" type="text" readonly="readonly" maxlength="20" class="input-medium Wdate"
+					value="<fmt:formatDate value="${storeEquipment.equipmentdate}" pattern="yyyy-MM-dd HH:mm:ss"/>"
+					onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',isShowClear:false});"/>
+			</li> --%>
+			<li><label>设备型号：</label>
+				<form:input path="equipmenttype" htmlEscape="false" maxlength="255" class="input-medium"/>
+			</li>
+			<li><label>绑定小程序：</label>
+				<form:radiobuttons path="isbinding" items="${fns:getDictList('isbinding')}" itemLabel="label" itemValue="value" htmlEscape="false"/>
+			</li>
+			<li class="btns"><input id="btnSubmit" class="btn btn-primary" type="submit" value="查询"/></li>
+			<li class="clearfix"></li>
+		</ul>
+	</form:form>
+	<sys:message content="${message}"/>
+	<table id="contentTable" class="table table-striped table-bordered table-condensed">
+		<thead>
+			<tr>
+				<th>设备编号</th>
+				<th>设备名称</th>
+				<th>质保日期</th>
+				<th>设备型号</th>
+				<th>店内设备编号</th>
+				<th>绑定小程序</th>
+				<shiro:hasPermission name="equip:equipment:storeEquipment:edit"><th>操作</th></shiro:hasPermission>
+			</tr>
+		</thead>
+		<tbody>
+		<c:forEach items="${page.list}" var="storeEquipment">
+			<tr>
+				<td><a href="${ctx}/equip/equipment/storeEquipment/form?id=${storeEquipment.id}">
+					${storeEquipment.equipmentno}
+				</a></td>
+				<td>
+				${storeNo}
+					${storeEquipment.equipmentname}
+				</td>
+				<td>
+					<fmt:formatDate value="${storeEquipment.equipmentdate}" pattern="yyyy-MM-dd HH:mm:ss"/>
+				</td>
+				<td>
+					${storeEquipment.equipmenttype}
+				</td>
+				<td>
+					${storeEquipment.storeequipno}
+				</td>
+				<td>
+					${fns:getDictLabel(storeEquipment.isbinding, 'isbinding', '')}
+				</td>
+				<shiro:hasPermission name="equip:equipment:storeEquipment:edit"><td>
+    				<a href="${ctx}/equip/equipment/storeEquipment/form?id=${storeEquipment.id}">修改</a>
+					<a href="${ctx}/equip/equipment/storeEquipment/delete?id=${storeEquipment.id}" onclick="return confirmx('确认要删除该门店设备吗？', this.href)">删除</a>
+				</td></shiro:hasPermission>
+			</tr>
+		</c:forEach>
+		</tbody>
+	</table>
+	<div class="pagination">${page}</div>
+</body>
+</html>

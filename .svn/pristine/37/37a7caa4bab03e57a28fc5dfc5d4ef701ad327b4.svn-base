@@ -1,0 +1,93 @@
+/**
+ * Copyright &copy; 2012-2016 <a href="https://github.com/xla/csgame">csgame</a> All rights reserved.
+ */
+package com.csgame.modules.gmoduleinfo.web;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.UUID;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import com.csgame.common.config.Global;
+import com.csgame.common.persistence.Page;
+import com.csgame.common.web.BaseController;
+import com.csgame.common.utils.StringUtils;
+import com.csgame.modules.gmoduleinfo.entity.Gamemodutype;
+import com.csgame.modules.gmoduleinfo.service.GamemodutypeService;
+
+/**
+ * 游戏模式管理Controller
+ * @author cy
+ * @version 2018-08-14
+ */
+@Controller
+@RequestMapping(value = "${adminPath}/gmoduleinfo/gamemodutype")
+public class GamemodutypeController extends BaseController {
+
+	@Autowired
+	private GamemodutypeService gamemodutypeService;
+	
+	@ModelAttribute
+	public Gamemodutype get(@RequestParam(required=false) String id) {
+		Gamemodutype entity = null;
+		if (StringUtils.isNotBlank(id)){
+			entity = gamemodutypeService.get(id);
+		}
+		if (entity == null){
+			entity = new Gamemodutype();
+		}
+		return entity;
+	}
+	
+	@RequiresPermissions("gmoduleinfo:gamemodutype:view")
+	@RequestMapping(value = {"list", ""})
+	public String list(Gamemodutype gamemodutype, HttpServletRequest request, HttpServletResponse response, Model model) {
+		Page<Gamemodutype> page = gamemodutypeService.findPage(new Page<Gamemodutype>(request, response), gamemodutype); 
+		model.addAttribute("page", page);
+		return "modules/gmoduleinfo/gamemodutypeList";
+	}
+
+	@RequiresPermissions("gmoduleinfo:gamemodutype:view")
+	@RequestMapping(value = "form")
+	public String form(Gamemodutype gamemodutype, Model model) {
+		model.addAttribute("gamemodutype", gamemodutype);
+		return "modules/gmoduleinfo/gamemodutypeForm";
+	}
+
+	@RequiresPermissions("gmoduleinfo:gamemodutype:edit")
+	@RequestMapping(value = "save")
+	public String save(Gamemodutype gamemodutype, Model model, RedirectAttributes redirectAttributes) {
+		if (!beanValidator(model, gamemodutype)){
+			return form(gamemodutype, model);
+		}
+/*		if(gamemodutype.getId()==null||gamemodutype.getId().equals("")){
+			gamemodutype.setId(UUID.randomUUID().toString().replace("-", ""));
+		}*/
+		if(gamemodutype.getRemarktime()==null||gamemodutype.getRemarktime().equals("")){
+			gamemodutype.setRemarktime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
+		}
+		gamemodutypeService.save(gamemodutype);
+		addMessage(redirectAttributes, "保存模式成功");
+		return "redirect:"+Global.getAdminPath()+"/gmoduleinfo/gamemodutype/?repage";
+	}
+	
+	@RequiresPermissions("gmoduleinfo:gamemodutype:edit")
+	@RequestMapping(value = "delete")
+	public String delete(Gamemodutype gamemodutype, RedirectAttributes redirectAttributes) {
+		gamemodutypeService.delete(gamemodutype);
+		addMessage(redirectAttributes, "删除保存模式成功成功");
+		return "redirect:"+Global.getAdminPath()+"/gmoduleinfo/gamemodutype/?repage";
+	}
+
+}

@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.csgame.modules.gameinfo.dao.GamemapinfoDao">
+    
+	<sql id="gamemapinfoColumns">
+		a.gamemapid AS "gamemapid",
+		a.gamemapimg AS "gamemapimg",
+		a.gamemapshop AS "gamemapshop",
+		a.ggunpoi AS "ggunpoi",
+		a.gamemapcenter AS "gamemapcenter",
+		a.gamemaprang AS "gamemaprang",
+		a.gsafepoi AS "gsafepoi",
+		a.creatby AS "creatby",
+		a.remarktime AS "remarktime",
+		a.scirintime AS "scirintime",
+		a.scrichtime AS "scrichtime",
+		a.stinjur AS "stinjur",
+		a.addinjur AS "addinjur",
+		a.remarks AS "remarks",
+		a.remarkstw AS "remarkstw",
+		a.remarksth AS "remarksth"
+	</sql>
+	
+	<sql id="gamemapinfoColumnss">
+		a.gamemapid AS "gamemapid",
+		a.gamemapimg AS "gamemapimg",
+		b.name AS "gamemapshop",
+		a.ggunpoi AS "ggunpoi",
+		a.gamemapcenter AS "gamemapcenter",
+		a.gamemaprang AS "gamemaprang",
+		a.gsafepoi AS "gsafepoi",
+		a.creatby AS "creatby",
+		a.remarktime AS "remarktime",
+		a.scirintime AS "scirintime",
+		a.scrichtime AS "scrichtime",
+		a.stinjur AS "stinjur",
+		a.addinjur AS "addinjur",
+		a.remarks AS "remarks",
+		a.remarkstw AS "remarkstw",
+		a.remarksth AS "remarksth"
+	</sql>	
+	
+	<sql id="gamemapinfoJoins">
+	</sql>
+    
+	<select id="get" resultType="Gamemapinfo">
+		SELECT 
+			<include refid="gamemapinfoColumns"/>
+		FROM gamemapinfo a
+		<include refid="gamemapinfoJoins"/>
+		WHERE a.gamemapid = #{gamemapid}
+	</select>
+	
+	<select id="findList" resultType="Gamemapinfo">
+		SELECT 
+			<include refid="gamemapinfoColumnss"/>
+		FROM gamemapinfo a,sys_office b
+		<include refid="gamemapinfoJoins"/>
+		<where>
+			a.gamemapshop = b.id and a.gamemapshop=#{gamemapshop}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY remarktime desc
+			</when>
+			<otherwise>
+				ORDER BY remarktime desc
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="Gamemapinfo">
+		SELECT 
+			<include refid="gamemapinfoColumns"/>
+		FROM gamemapinfo a
+		<include refid="gamemapinfoJoins"/>
+		<where>
+			
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY remarktime desc
+			</when>
+			<otherwise>
+				ORDER BY remarktime desc
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+INSERT INTO gamemapinfo(
+			gamemapid,
+			gamemapimg,
+			gamemapshop,
+			ggunpoi,
+			gamemapcenter,
+			gamemaprang,
+			gsafepoi,
+			creatby,
+			remarktime,
+			scirintime,
+			scrichtime,
+			stinjur,
+			addinjur,
+			remarks,
+			remarkstw,
+			remarksth
+		) VALUES (
+			#{gamemapid},
+			#{gamemapimg},
+			#{gamemapshop},
+			#{ggunpoi},
+			#{gamemapcenter},
+			#{gamemaprang},
+			#{gsafepoi},
+			#{creatby},
+			#{remarktime},
+			#{scirintime},
+			#{scrichtime},
+			#{stinjur},
+			#{addinjur},
+			#{remarks},
+			#{remarkstw},
+			#{remarksth}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE gamemapinfo SET 	
+			gamemapid = #{gamemapid},
+			gamemapimg = #{gamemapimg},
+			gamemapshop = #{gamemapshop},
+			ggunpoi = #{ggunpoi},
+			gamemapcenter = #{gamemapcenter},
+			gamemaprang = #{gamemaprang},
+			gsafepoi = #{gsafepoi},
+			creatby = #{creatby},
+			remarktime = #{remarktime},
+			scirintime = #{scirintime},
+			scrichtime = #{scrichtime},
+			stinjur = #{stinjur},
+			addinjur = #{addinjur},
+			remarks = #{remarks},
+			remarkstw = #{remarkstw},
+			remarksth = #{remarksth}
+	</update>
+	
+	<update id="delete">
+		DELETE FROM gamemapinfo
+		WHERE gamemapid = #{gamemapid}
+	</update>
+
+	<select id="seleshopmap" resultType="java.util.Map">
+		select ggunpoi,gamemapcenter,gamemaprang,gsafepoi from gamemapinfo where gamemapid=#{gamemapid}
+	</select>	
+	
+</mapper>

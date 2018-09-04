@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.csgame.modules.gmoduleinfo.dao.GamemodutypeDao">
+    
+	<sql id="gamemodutypeColumns">
+		a.id AS "id",
+		a.gamemname AS "gamemname",
+		a.gamemtype AS "gamemtype",
+		a.gamemcount AS "gamemcount",
+		a.remarkshop AS "remarkshop",
+		a.remarkman AS "remarkman",
+		a.remarktime AS "remarktime"
+	</sql>
+
+	<sql id="gmtypeColumns">
+		a.id AS "id",
+		a.gamemname AS "gamemname",
+		a.gamemtype AS "gamemtype",
+		a.gamemcount AS "gamemcount",
+		b.name AS "remarkshop",
+		a.remarkman AS "remarkman",
+		a.remarktime AS "remarktime"
+	</sql>
+	
+	<sql id="gamemodutypeJoins">
+	</sql>
+    
+	<select id="get" resultType="Gamemodutype">
+		SELECT 
+			<include refid="gamemodutypeColumns"/>
+		FROM gamemodutype a
+		<include refid="gamemodutypeJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="Gamemodutype">
+		SELECT 
+			<include refid="gmtypeColumns"/>
+		FROM gamemodutype a,sys_office b
+		<include refid="gamemodutypeJoins"/>
+		<where>
+			a.remarkshop = b.id and a.remarkshop=#{remarkshop} 
+			<if test="gamemtype != null and gamemtype != ''">
+				AND a.gamemtype = #{gamemtype}
+			</if>
+			<if test="remarktime != null and remarktime != ''">
+				AND a.remarktime = #{remarktime}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY remarktime desc
+			</when>
+			<otherwise>
+				ORDER BY remarktime desc
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="Gamemodutype">
+		SELECT 
+			<include refid="gmtypeColumns"/>
+		FROM gamemodutype a,sys_office b
+		<include refid="gamemodutypeJoins"/>
+		<where>
+			a.remarkshop = b.id and a.remarkshop=#{remarkshop} 
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO gamemodutype(
+			id,
+			gamemname,
+			gamemtype,
+			
+			remarkshop,
+			remarkman,
+			remarktime
+		) VALUES (
+			#{id},
+			#{gamemname},
+			#{gamemtype},
+			
+			#{remarkshop},
+			#{remarkman},
+			#{remarktime}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE gamemodutype SET 	
+			gamemname = #{gamemname},
+			gamemtype = #{gamemtype},
+			
+			remarkshop = #{remarkshop},
+			remarkman = #{remarkman}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		DELETE FROM gamemodutype
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

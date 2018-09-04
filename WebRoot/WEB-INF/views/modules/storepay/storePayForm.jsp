@@ -1,0 +1,105 @@
+<%@ page contentType="text/html;charset=UTF-8"%>
+<%@ include file="/WEB-INF/views/include/taglib.jsp"%>
+<html>
+<head>
+<title>充值记录管理</title>
+<meta name="decorator" content="default" />
+<script type="text/javascript">
+	/* window.onload = function() {
+		debugger
+		$.ajax({
+			url : '${ctx}/storepay/storePay/findBalance',
+			type : 'post',
+			dataType: "json",
+			async : false,
+			success : function(data) {
+				alert("成功了");
+			},
+			error : function(data, XMLHttpRequest, textStatus, errorThrown) {
+				alert(data);
+				alert(XMLHttpRequest.status);
+				alert(XMLHttpRequest.readyState);
+				alert(textStatus);
+			}
+		});
+	} */
+	$(document).ready(function() {
+
+
+		//$("#name").focus();
+		$("#inputForm").validate({
+			submitHandler : function(form) {
+				loading('正在提交，请稍等...');
+				form.submit();
+			},
+			errorContainer : "#messageBox",
+			errorPlacement : function(error, element) {
+				$("#messageBox").text("输入有误，请先更正。");
+				if (element.is(":checkbox") || element.is(":radio") || element.parent().is(".input-append")) {
+					error.appendTo(element.parent().parent());
+				} else {
+					error.insertAfter(element);
+				}
+			}
+		});
+	});
+</script>
+</head>
+<body>
+	<ul class="nav nav-tabs">
+		<li><a href="${ctx}/storepay/storePay/">充值记录列表</a></li>
+		<li class="active"><a
+			href="${ctx}/storepay/storePay/form?id=${storePay.id}">充值记录<shiro:hasPermission
+					name="storepay:storePay:edit">${not empty storePay.id?'修改':'添加'}</shiro:hasPermission>
+				<shiro:lacksPermission name="storepay:storePay:edit">查看</shiro:lacksPermission></a></li>
+	</ul>
+	<br />
+	<form:form id="inputForm" modelAttribute="storePay"
+		action="${ctx}/storepay/storePay/save" method="post"
+		class="form-horizontal">
+		<form:hidden path="id" />
+		<sys:message content="${message}" />
+		<%-- 	<div class="control-group">
+			<label class="control-label">门店编号：</label>
+			<div class="controls">
+				<form:input path="storeno" htmlEscape="false" maxlength="64" class="input-xlarge "/>
+			</div>
+		</div> --%>
+		<%-- <div class="control-group">
+			<label class="control-label">电话：</label>
+			<div class="controls">
+				<form:input path="tel" htmlEscape="false" maxlength="64"
+					class="input-xlarge " />
+			</div>
+		</div> --%>
+		<div class="control-group">
+			<label class="control-label">充值金额：</label>
+			<div class="controls">
+				<form:input path="recharge" htmlEscape="false" class="input-xlarge " />
+			</div>
+		</div>
+		<div class="control-group">
+			<label class="control-label">余额：</label>
+			<div class="controls">
+				<form:input path="balance" htmlEscape="false" class="input-xlarge "
+					type="text" value="${storePay.balance}" />
+			</div>
+		</div>
+		<div class="control-group">
+			<label class="control-label">备注信息：</label>
+			<div class="controls">
+				<form:textarea path="remarks" htmlEscape="false" rows="4"
+					maxlength="255" class="input-xxlarge " />
+			</div>
+		</div>
+
+		<div class="form-actions">
+			<shiro:hasPermission name="storepay:storePay:edit">
+				<input id="btnSubmit" class="btn btn-primary" type="submit"
+					value="保 存" />&nbsp;</shiro:hasPermission>
+			<input id="btnCancel" class="btn" type="button" value="返 回"
+				onclick="history.go(-1)" />
+		</div>
+	</form:form>
+</body>
+</html>

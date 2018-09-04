@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.csgame.modules.gameinfo.dao.GamemapinfoDao">
+    
+	<sql id="gamemapinfoColumns">
+		a.gamemapid AS "gamemapid", 
+		a.gamemapname AS "gamemapname",
+		a.gamemapshop AS "gamemapshop",
+		a.gamemaptype AS "gamemaptype",
+		a.gamemapcenter AS "gamemapcenter",
+		a.gamemaprang AS "gamemaprang",
+		a.creatby AS "creatby",
+		a.gsafepoi AS "gsafepoi",
+		a.remarktime AS "remarktime",
+		a.remarks AS "remarks",
+		a.remarkstw AS "remarkstw",
+		a.remarksth AS "remarksth"
+	</sql>
+	
+	<sql id="gamemapinfoJoins">
+	</sql>
+    
+	<select id="get" resultType="Gamemapinfo">
+		SELECT 
+			<include refid="gamemapinfoColumns"/>
+		FROM gamemapinfo a
+		<include refid="gamemapinfoJoins"/>
+		WHERE a.gamemapid = #{gamemapid}
+	</select>
+	
+	<select id="findList" resultType="Gamemapinfo">
+		SELECT 
+			<include refid="gamemapinfoColumns"/>
+		FROM gamemapinfo a
+		<include refid="gamemapinfoJoins"/>
+		<where>
+			
+			<if test="gamemapname != null and gamemapname != ''">
+				AND a.gamemapname LIKE 
+					<if test="dbName == 'oracle'">'%'||#{gamemapname}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{gamemapname}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{gamemapname},'%')</if>
+			</if>
+			<if test="gamemaptype != null and gamemaptype != ''">
+				AND a.gamemaptype = #{gamemaptype}
+			</if>
+			<if test="beginCreatedate != null and endCreatedate != null and beginCreatedate != '' and endCreatedate != ''">
+				AND a.remarktime BETWEEN #{beginCreatedate} AND #{endCreatedate}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY remarktime desc
+			</when>
+			<otherwise>
+				ORDER BY remarktime desc
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="Gamemapinfo">
+		SELECT 
+			<include refid="gamemapinfoColumns"/>
+		FROM gamemapinfo a
+		<include refid="gamemapinfoJoins"/>
+		<where>
+			
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO gamemapinfo(
+			gamemapid, 
+			gamemapname,
+			gamemapshop,
+			gamemaptype,
+			gamemapcenter,
+			gamemaprang,
+			creatby,
+			gsafepoi,
+			remarktime,
+			remarks,
+			remarkstw,
+			remarksth
+		) VALUES (
+			#{gamemapid},
+			#{gamemapname},
+			#{gamemapshop},
+			#{gamemaptype},
+			#{gamemapcenter},
+			#{gamemaprang},
+			#{creatby},
+			#{gsafepoi},
+			#{remarktime},
+			#{remarks},
+			#{remarkstw},
+			#{remarksth}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE gamemapinfo SET 	
+			gamemapname = #{gamemapname},
+			gamemapshop = #{gamemapshop},
+			gamemaptype = #{gamemaptype},
+			gamemapcenter = #{gamemapcenter},
+			gamemaprang = #{gamemaprang},
+			creatby = #{creatby},
+			gsafepoi = #{gsafepoi},
+			remarktime = #{remarktime},
+			remarks = #{remarks},
+			remarkstw = #{remarkstw},
+			remarksth = #{remarksth}
+		WHERE gamemapid = #{gamemapid}
+	</update>
+	
+	<update id="delete">
+		DELETE FROM gamemapinfo
+		WHERE gamemapid = #{gamemapid}
+	</update>
+	
+</mapper>

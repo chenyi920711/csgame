@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.csgame.modules.gamehomeinfo.dao.GamehomeDao">
+    
+	<sql id="gamehomeColumns">
+		a.id AS "id",
+		a.gromname AS "gromname",
+		a.grommap AS "grommap",
+		a.grommodu AS "grommodu",
+		a.createshop AS "createshop",
+		a.adjusthp AS "adjusthp",
+		a.peohp AS "peohp",
+		a.havecircle AS "havecircle",
+		a.startinjur AS "startinjur",
+		a.everyinjur AS "everyinjur",
+		a.teamtype AS "teamtype",
+		a.teampeo AS "teampeo",
+		a.allpeo AS "allpeo",
+		a.createby AS "createby",
+		a.createtime AS "createtime",
+		a.homestate AS "homestate",
+		a.updateby AS "updateby",
+		a.updatetime AS "updatetime",
+		a.remarks AS "remarks"
+	</sql>
+	
+	<sql id="gamehomeJoins">
+	</sql>
+    
+	<select id="get" resultType="Gamehome">
+		SELECT 
+			<include refid="gamehomeColumns"/>
+		FROM gamehome a
+		<include refid="gamehomeJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="Gamehome">
+		SELECT 
+			<include refid="gamehomeColumns"/>
+		FROM gamehome a
+		<include refid="gamehomeJoins"/>
+		<where>
+			
+			<if test="homestate != null and homestate != ''">
+				AND a.homestate = #{homestate}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="Gamehome">
+		SELECT 
+			<include refid="gamehomeColumns"/>
+		FROM gamehome a
+		<include refid="gamehomeJoins"/>
+		<where>
+			
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO gamehome(
+			gromname,
+			grommap,
+			grommodu,
+			createshop,
+			adjusthp,
+			peohp,
+			havecircle,
+			startinjur,
+			everyinjur,
+			teamtype,
+			teampeo,
+			allpeo,
+			createby,
+			remarks
+		) VALUES (
+			#{gromname},
+			#{grommap},
+			#{grommodu},
+			#{createshop},
+			#{adjusthp},
+			#{peohp},
+			#{havecircle},
+			#{startinjur},
+			#{everyinjur},
+			#{teamtype},
+			#{teampeo},
+			#{allpeo},
+			#{createby},
+			#{remarks}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE gamehome SET 	
+			gromname = #{gromname},
+			grommap = #{grommap},
+			grommodu = #{grommodu},
+			createshop = #{createshop},
+			adjusthp = #{adjusthp},
+			peohp = #{peohp},
+			havecircle = #{havecircle},
+			startinjur = #{startinjur},
+			everyinjur = #{everyinjur},
+			teamtype = #{teamtype},
+			teampeo = #{teampeo},
+			allpeo = #{allpeo},
+			createby = #{createby},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		DELETE FROM gamehome
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

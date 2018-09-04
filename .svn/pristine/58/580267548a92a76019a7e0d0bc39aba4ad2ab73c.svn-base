@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.csgame.modules.equip.dao.equipment.StoreEquipmentDao">
+    
+	<sql id="storeEquipmentColumns">
+		a.id AS "id",
+		a.equipmentno AS "equipmentno",
+		a.equipmentname AS "equipmentname",
+		a.equipmentdate AS "equipmentdate",
+		a.equipmenttype AS "equipmenttype",
+		a.storeequipno AS "storeequipno",
+		a.isbinding AS "isbinding",
+		a.storeno AS "storeno",
+		a.storename AS "storename",
+		a.create_by AS "createBy.id",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="storeColumns">
+		a.id AS "id",
+		a.equipmentno AS "equipmentno",
+		a.equipmentname AS "equipmentname",
+		a.equipmentdate AS "equipmentdate",
+		a.equipmenttype AS "equipmenttype",
+		a.storeequipno AS "storeequipno",
+		a.isbinding AS "isbinding",
+		b.name AS "storeno",
+		a.storename AS "storename",
+		a.create_by AS "createBy.id",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="storeEquipmentJoins">
+	</sql>
+    
+	<select id="get" resultType="StoreEquipment">
+		SELECT 
+			<include refid="storeEquipmentColumns"/>
+		FROM store_equipment a
+		<include refid="storeEquipmentJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="StoreEquipment">
+		SELECT 
+			<include refid="storeColumns"/>
+		FROM store_equipment a,sys_office b
+		<include refid="storeEquipmentJoins"/>
+		<where>
+			a.storeno = b.id and  a.storeno=#{storeno} and
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="equipmentno != null and equipmentno != ''">
+				AND a.equipmentno = #{equipmentno}
+			</if>
+			<if test="equipmentname != null and equipmentname != ''">
+				AND a.equipmentname = #{equipmentname}
+			</if>
+			<if test="equipmentdate != null and equipmentdate != ''">
+				AND a.equipmentdate = #{equipmentdate}
+			</if>
+			<if test="equipmenttype != null and equipmenttype != ''">
+				AND a.equipmenttype = #{equipmenttype}
+			</if>
+			<if test="isbinding != null and isbinding != ''">
+				AND a.isbinding = #{isbinding}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="StoreEquipment">
+		SELECT 
+			<include refid="storeColumns"/>
+		FROM store_equipment a,sys_office b
+		<include refid="storeColumns"/>
+		<where>
+			a.storeno = b.id and a.storeno=#{storeno} and
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO store_equipment(
+			id,
+			equipmentno,
+			equipmentname,
+			equipmentdate,
+			equipmenttype,
+			storeequipno,
+			isbinding,
+			storeno,
+			storename,
+			create_by,
+			del_flag
+		) VALUES (
+			#{id},
+			#{equipmentno},
+			#{equipmentname},
+			#{equipmentdate},
+			#{equipmenttype},
+			#{storeequipno},
+			#{isbinding},
+			#{storeno},
+			#{storename},
+			#{createBy.id},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE store_equipment SET 	
+			equipmentno = #{equipmentno},
+			equipmentname = #{equipmentname},
+			equipmentdate = #{equipmentdate},
+			equipmenttype = #{equipmenttype},
+			storeequipno = #{storeequipno},
+			isbinding = #{isbinding},
+			storeno = #{storeno},
+			storename = #{storename},
+			create_by = #{createBy.id}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE store_equipment SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

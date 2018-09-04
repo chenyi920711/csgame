@@ -1,0 +1,18 @@
+/**
+ * Copyright &copy; 2012-2016 <a href="https://github.com/xla/csgame">csgame</a> All rights reserved.
+ */
+package com.csgame.modules.storepay.dao;
+
+import com.csgame.common.persistence.CrudDao;
+import com.csgame.common.persistence.annotation.MyBatisDao;
+import com.csgame.modules.storepay.entity.StorePay;
+
+/**
+ * 门店充值DAO接口
+ * @author wxf
+ * @version 2018-08-16
+ */
+@MyBatisDao
+public interface StorePayDao extends CrudDao<StorePay> {
+	
+}

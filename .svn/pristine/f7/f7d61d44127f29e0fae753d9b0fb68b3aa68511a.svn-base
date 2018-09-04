@@ -1,0 +1,442 @@
+<%@ page contentType="text/html;charset=UTF-8" %>
+<%@ include file="/WEB-INF/views/include/taglib.jsp"%>
+<html>
+<head>
+	<title>地图管理</title>
+	<meta name="decorator" content="default"/>
+	<meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+<!--     <meta name="viewport" content="initial-scale=1.0, user-scalable=no, width=device-width"> -->
+    <link rel="stylesheet" href="https://cache.amap.com/lbs/static/main1119.css"/>
+    <script type="text/javascript" src="https://webapi.amap.com/maps?v=1.4.8&key=3569ec90020ba941e9269f398bc8896c&plugin=AMap.MouseTool,AMap.PolyEditor,AMap.CircleEditor,AMap.RectangleEditor"></script>
+    <script type="text/javascript" src="https://cache.amap.com/lbs/static/addToolbar.js"></script>
+    <style>
+        .context_menu {
+            margin: 2px;
+            padding: 2px;
+            list-style-type: none;
+            position: relative;
+            background-color: rgb(255, 255, 255);
+            border: 1px solid rgb(175, 175, 175);
+            border-radius: 5px;
+            box-shadow: rgb(153, 153, 153) 2px 2px 8px;
+            white-space: nowrap;
+            cursor: pointer;
+        }
+        .context_menu li {
+            text-indent: 0.5em;
+            color: blue;
+            font-size: 13px;
+            font-family: verdana;
+            height: 20px;
+            line-height: 20px;
+            word-break: break-all;
+            white-space: nowrap;
+        }
+        .context_menu li.split_line {
+            border-bottom-color: rgb(204, 204, 204);
+            border-bottom-style: solid;
+            border-bottom-width: 1px;
+        }
+    </style>    
+	<script type="text/javascript">
+		$(document).ready(function() {
+			//$("#name").focus();
+			$("#inputForm").validate({
+				submitHandler: function(form){
+					loading('正在提交，请稍等...');
+					form.submit();
+				},
+				errorContainer: "#messageBox",
+				errorPlacement: function(error, element) {
+					$("#messageBox").text("输入有误，请先更正。");
+					if (element.is(":checkbox")||element.is(":radio")||element.parent().is(".input-append")){
+						error.appendTo(element.parent().parent());
+					} else {
+						error.insertAfter(element);
+					}
+				}
+			});
+		});
+	</script>
+</head>
+<body>
+	<ul class="nav nav-tabs">
+		<li><a href="${ctx}/gameinfo/gamemapinfo/">地图列表</a></li>
+		<li class="active"><a href="${ctx}/gameinfo/gamemapinfo/form?id=${gamemapinfo.id}">地图<shiro:hasPermission name="gameinfo:gamemapinfo:edit">${not empty gamemapinfo.id?'修改':'添加'}</shiro:hasPermission><shiro:lacksPermission name="gameinfo:gamemapinfo:edit">查看</shiro:lacksPermission></a></li>
+	</ul><br/>
+	<form:form cssStyle="display:none;" id="inputForm" modelAttribute="gamemapinfo" action="${ctx}/gameinfo/gamemapinfo/resave" method="post" class="form-horizontal">
+		<form:hidden path="id"/>
+		<sys:message content="${message}"/>
+		<form:hidden path="gamemapid"/>		
+		<div class="control-group">
+			<label class="control-label">地图名称：</label>
+			<div class="controls">
+				<form:input id="mapname" path="gamemapname" htmlEscape="false" maxlength="50" class="input-xlarge required"/>
+				<span class="help-inline"><font color="red">*</font> </span>
+			</div>
+		</div>
+		<div class="control-group">
+			<label class="control-label">所属门店：</label>
+			<div class="controls">
+				<form:input id="sopcode" value="${fns:getUser().id}" path="gamemapshop" htmlEscape="false" maxlength="33" class="input-xlarge required"/>
+				<span class="help-inline"><font color="red">*</font> </span>
+			</div>
+		</div>
+		<div class="control-group">
+			<label class="control-label">地图范围类型：</label>
+			<div class="controls">
+				<form:input id="maptype" path="gamemaptype" htmlEscape="false" maxlength="32" class="input-xlarge required"/>
+				<span class="help-inline"><font color="red">*</font> </span>
+			</div>
+		</div>
+		<div class="control-group">
+			<label class="control-label">地图中心：</label>
+			<div class="controls">
+				<form:input id="mapcenter" path="gamemapcenter" htmlEscape="false" class="input-xlarge required"/>
+				<span class="help-inline"><font color="red">*</font> </span>
+			</div>
+		</div>
+		<div class="control-group">
+			<label class="control-label">地图范围：</label>
+			<div class="controls">
+				<form:input id="maprange" path="gamemaprang" htmlEscape="false" maxlength="100" class="input-xlarge required"/>
+				<span class="help-inline"><font color="red">*</font> </span>
+			</div>
+		</div>
+		<div class="control-group">
+			<label class="control-label">创建人：</label>
+			<div class="controls">
+				<form:input path="creatby" value="${fns:getUser().name}" htmlEscape="false" id="cpeo" maxlength="50" class="input-xlarge "/>
+			</div>
+		</div>
+		<div class="control-group">
+			<label class="control-label">安全点位置：</label>
+			<div class="controls">
+				<form:input id="safepo" path="gsafepoi" htmlEscape="false" maxlength="300" class="input-xlarge "/>
+			</div>
+		</div>
+		<div class="control-group">
+			<label class="control-label">创建时间：</label>
+			<div class="controls">
+				<input name="remarktime" type="text" readonly="readonly" maxlength="20" class="input-medium Wdate "
+					value="${gamemapinfo.remarktime}" />
+			</div>
+		</div>
+		<div class="control-group">
+			<label class="control-label">备注：</label>
+			<div class="controls">
+				<form:textarea path="remarks" htmlEscape="false" rows="4" maxlength="100" class="input-xxlarge "/>
+			</div>
+		</div>
+<%-- 		<div class="control-group">
+			<label class="control-label">备注2：</label>
+			<div class="controls">
+				<form:input path="remarkstw" htmlEscape="false" maxlength="100" class="input-xlarge "/>
+			</div>
+		</div>
+		<div class="control-group">
+			<label class="control-label">备注3：</label>
+			<div class="controls">
+				<form:input path="remarksth" htmlEscape="false" maxlength="100" class="input-xlarge "/>
+			</div>
+		</div> 
+		<div class="form-actions">
+			<shiro:hasPermission name="gameinfo:gamemapinfo:edit"><input id="btnSubmit" class="btn btn-primary" type="submit" value="保 存"/>&nbsp;</shiro:hasPermission>
+			<input id="btnCancel" class="btn" type="button" value="返 回" onclick="history.go(-1)"/>
+		</div> --%>
+	</form:form>
+<div id="container"></div>
+<div id="tip">地图控制</div>
+<div class="button-group">
+  <input type="button" id="selerectan" class="button" value="区域选定" onClick="rectangleeditor()"/>
+<!--   <input type="button" id="selecirc" class="button" value="圆形区域选定" onClick="editcircle()"/> -->
+  <input type="button" id="selerectan" class="button" value="移除区域" onClick="removcirorrec()"/>
+  <input type="button" id="checgetmap" class="button" value="确定提交地图" onClick="takemapform()"/>
+</div>	
+
+<script type="text/javascript">
+    var map = new AMap.Map("container", {
+    	zoom:15,
+    	resizeEnable: true
+       
+    });
+    var menu=new ContextMenu(map);
+    function ContextMenu(map) {
+        var me = this;
+        this.mouseTool = new AMap.MouseTool(map); //地图中添加鼠标工具MouseTool插件
+        this.contextMenuPositon = null;
+        var content = [];
+        content.push("<div>");
+        content.push("    <ul class='context_menu'>");
+        content.push("        <li onclick='menu.zoomMenu(0)'>缩小</li>");
+        content.push("        <li class='split_line' onclick='menu.zoomMenu(1)'>放大</li>");
+        content.push("        <li class='split_line' onclick='menu.distanceMeasureMenu()'>距离量测</li>");
+        content.push("        <li id='centpoi'  onclick='menu.addcentMenu()'>添加中心点</li>");
+        content.push("        <li id='safepoi'  onclick='menu.addMarkerMenu()'>添加补给点</li>");
+        content.push("        <li id='centpoi'  onclick='menu.removMarkerMenu()'>移除上一个标记点</li>");
+        content.push("    </ul>");
+        content.push("</div>");
+        this.contextMenu = new AMap.ContextMenu({isCustom: true, content: content.join('')});//通过content自定义右键菜单内容
+
+       //地图绑定鼠标右击事件——弹出右键菜单
+        map.on('rightclick', function(e) {
+            me.contextMenu.open(map, e.lnglat);
+            me.contextMenuPositon = e.lnglat; //右键菜单位置
+        });        
+    }
+
+    ContextMenu.prototype.zoomMenu = function zoomMenu(tag) {//右键菜单缩放地图
+        if (tag === 0) {
+            map.zoomOut();
+        }
+        if (tag === 1) {
+            map.zoomIn();
+        }
+        this.contextMenu.close();
+    }
+    ContextMenu.prototype.distanceMeasureMenu=function () {  //右键菜单距离量测
+        this.mouseTool.rule();
+        this.contextMenu.close();
+    }
+    ContextMenu.prototype.addMarkerMenu=function () {  //右键菜单添加Marker标记
+        this.mouseTool.close();
+        var cListts = map.getAllOverlays('marker');
+        if(cListts.length<1){
+        	alert("请先确定中心点后再进行添加补给点！");
+        }else{
+            var marker = new AMap.Marker({
+                map: map,
+                position: this.contextMenuPositon //基点位置
+            });
+        }
+        this.contextMenu.close();
+    }
+    ContextMenu.prototype.addcentMenu=function () {  //添加中心点
+        this.mouseTool.close();
+        var cListt = map.getAllOverlays('marker');
+        if(cListt.length>0){
+        	alert("已经添加过中心点，请删除后添加");
+        }else{
+            var marker = new AMap.Marker({
+                map: map,
+                position: this.contextMenuPositon, //基点位置
+                icon: new AMap.Icon({            
+                    size: new AMap.Size(40, 50),  //图标大小
+                    image: "https://webapi.amap.com/theme/v1.3/images/newpc/way_btn2.png",
+                    imageOffset: new AMap.Pixel(0, -60)
+           		 })
+            });        	
+        }
+        this.contextMenu.close();
+    }
+    ContextMenu.prototype.removMarkerMenu=function () {  
+        this.mouseTool.close();
+        var cListts = map.getAllOverlays('marker');
+        if(cListts.length<1){
+        	alert("请先添加点后才能移除");
+           
+        }else{
+        	 cListts[cListts.length-1].setMap(null);       	
+        }
+
+        this.contextMenu.close();
+    }
+    
+
+    if(document.getElementById("mapcenter").value!=""&&document.getElementById("maprange").value!=""){
+    //回显地图点
+    	var cent = document.getElementById("mapcenter").value.split("#");
+    	if(cent.length>0){
+    	 var marker = new AMap.Marker({
+                map: map,
+                position: new AMap.LngLat(cent[0], cent[1]), //基点位置
+                icon: new AMap.Icon({            
+                    size: new AMap.Size(40, 50),  //图标大小
+                    image: "https://webapi.amap.com/theme/v1.3/images/newpc/way_btn2.png",
+                    imageOffset: new AMap.Pixel(0, -60)
+           		 })
+            }); 
+    	}
+    	
+    //回显范围
+    	var rang = document.getElementById("maprange").value.split("#");
+    	var ranen = rang[2].split("-");
+    	var ranws = rang[1].split("-");    
+    	var bondr = new AMap.Bounds(new AMap.LngLat(ranen[0], ranen[1]),new AMap.LngLat(ranws[0], ranws[1]));
+      		 var rectangler = new AMap.Rectangle({
+      	      map: map,
+      	      bounds: bondr,
+      	      strokeColor:'red',
+      	      strokeWeight:1,
+      	      strokeOpacity:0.5,
+      	      strokeDasharray: [30,10],
+      	      strokeStyle: 'solid',
+      	      fillColor:'blue',
+      	      fillOpacity:0.5,
+      	      zIndex:10,
+      	      bubble:true,
+      	      cursor:'pointer',
+      	      bubble: false
+      	    })
+      		var rectangleEditorr = new AMap.RectangleEditor(map, rectangler)
+        	rectangleEditorr.open(); 
+      		rectangler.on("click",function(e){
+      			rectangleEditorr.close();
+      			
+      		});    	
+      //回显标记点
+      var marksaf = document.getElementById("safepo").value.split("---");
+      for(var ma = 0; ma<=marksaf.length-1;ma++){
+      	var sma = marksaf[ma].split("#");
+        var marker = new AMap.Marker({
+            map: map,
+            position:new AMap.LngLat(sma[0], sma[1]) //基点位置
+        });      	
+      }
+     }
+
+    
+    function rectangleeditor(){
+    	var slii = map.getAllOverlays('marker');
+    	var recnum = map.getAllOverlays('rectangle');
+    	if(recnum.length>0){
+			alert("要创建新区域，需要先移除已有区域");
+		}else{
+	    	if(slii.length<1){
+	   			alert("还没选定中心点");
+	    	}else{
+	        	document.getElementById("selerectan").disabled=true;
+	/*         	document.getElementById("selecirc").disabled=false; */
+	        	var sli = map.getAllOverlays('circle');
+	        	if(sli.length>0){
+	        		sli[0].setMap(null);
+	        	}
+	        	  var bonds = new AMap.Bounds(slii[0].getPosition().offset(-500,-500),slii[0].getPosition().offset(500,500));
+	      		 var rectangle = new AMap.Rectangle({
+	      	      map: map,
+	      	      bounds: bonds,
+	      	      strokeColor:'red',
+	      	      strokeWeight:1,
+	      	      strokeOpacity:0.5,
+	      	      strokeDasharray: [30,10],
+	      	      strokeStyle: 'solid',
+	      	      fillColor:'blue',
+	      	      fillOpacity:0.5,
+	      	      zIndex:10,
+	      	      bubble:true,
+	      	      cursor:'pointer',
+	      	      bubble: false
+	      	    })
+	      		var rectangleEditor = new AMap.RectangleEditor(map, rectangle)
+	        	rectangleEditor.open(); 
+	      		rectangle.on("click",function(e){
+	      			rectangleEditor.close();
+	      			
+	      		});
+	        	 /* var editor={};
+	        	 editor._polygon=(function(){
+	        	        var arr = [ //构建多边形经纬度坐标数组
+	        	        [slii[0].getPosition().offset(500,500).P,slii[0].getPosition().offset(500,500).O],
+	        	        [slii[0].getPosition().offset(500,-500).P,slii[0].getPosition().offset(500,-500).O],
+	        	        [slii[0].getPosition().offset(-500,-500).P,slii[0].getPosition().offset(-500,-500).O],
+	        	        [slii[0].getPosition().offset(-500,500).P,slii[0].getPosition().offset(-500,500).O]
+	        	        ]
+	        	        return new AMap.Polygon({
+	        	            map: map,
+	        	            path: arr,
+	        	            strokeColor: "#0000ff",
+	        	            strokeOpacity: 1,
+	        	            strokeWeight: 3,
+	        	            fillColor: "#f5deb3",
+	        	            fillOpacity: 0.35
+	        	        });
+	        	    })();
+	        	 editor._polygonEditor= new AMap.PolyEditor(map, editor._polygon);
+	        	 editor._polygonEditor.open(); */
+	    	}		
+		}
+
+    }
+    function editcircle(){
+    	var slii = map.getAllOverlays('marker');
+    	if(slii.length<1){
+    	    
+   			alert("还没选定中心点");
+   			
+    	}else{
+        	var sli = map.getAllOverlays('rectangle');
+        	if(sli.length>0){
+        		sli[0].setMap(null);
+        	}
+            	var editor={};
+         	   editor._circle=(function(){
+         	        var circle = new AMap.Circle({
+         	            center: [slii[0].getPosition().P,slii[0].getPosition().O],// 圆心位置
+         	            radius: 500, //半径
+         	            strokeColor: "#F33", //线颜色
+         	            strokeOpacity: 1, //线透明度
+         	            strokeWeight: 2, //线粗细度
+         	            fillColor: "#ee2200", //填充颜色
+         	            fillOpacity: 0.35//填充透明度
+         	        });
+         	        circle.setMap(map);
+         	        return circle;
+         	    })();      	
+         	   editor._circleEditor= new AMap.CircleEditor(map, editor._circle);
+     	 	   editor._circleEditor.open(); 
+     	 	   circle.on("click",function(e){
+     	 		 alert(111);
+     	 		 editor._circleEditor.close();	
+          		});
+        	}
+    }
+    function removcirorrec(){
+    	var sli = map.getAllOverlays('rectangle');
+    	if(sli.length>0){
+    		sli[0].setMap(null);
+    	}
+    	var sli = map.getAllOverlays('circle');
+    	if(sli.length>0){
+    		sli[0].setMap(null);
+    	}
+    	document.getElementById("selerectan").disabled=false;
+/*     	document.getElementById("selecirc").disabled=false; */
+    }
+    
+    function takemapform(){
+    	var tslii = map.getAllOverlays('marker');
+    	var saf = "";
+    	var tform = document.getElementById("inputForm");
+    	if(tslii.length<1){
+    	console.log(document.getElementById("cpeo").value);
+    		alert("地图中心缺失！");
+    	}else{
+    		var tsli = map.getAllOverlays('rectangle');
+    		if(tsli.length<1){
+    			alert("请确定地图范围");
+    		}else{
+    			document.getElementById("maptype").value = "rectangle";
+    			
+    			document.getElementById("mapcenter").value 
+    				= tslii[0].getPosition().P+"#"+tslii[0].getPosition().O;
+    			
+    			document.getElementById("maprange").value 
+    				= tsli[0].getBounds().getCenter( ).P+"-"+tsli[0].getBounds().getCenter( ).O
+    				+"#"+tsli[0].getBounds().getSouthWest( ).P+"-"+tsli[0].getBounds().getSouthWest( ).O
+    				+"#"+tsli[0].getBounds().getNorthEast( ).P+"-"+tsli[0].getBounds().getNorthEast( ).O;
+    		
+    			for(var i=1;i<=tslii.length-2;i++){
+    				saf= saf+tslii[i].getPosition().P+"#"+tslii[i].getPosition().O+"---";
+    			}
+    			saf = saf+tslii[tslii.length-1].getPosition().P+"#"+tslii[tslii.length-1].getPosition().O;
+    			document.getElementById("safepo").value = saf;
+    			tform.submit();
+    		}
+    	}
+    }
+    
+</script>
+</body>
+
+</html>

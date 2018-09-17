@@ -29,9 +29,14 @@
 				    window.location.replace("${ctx}/gamehomeinfo/gamehome/form");
 				  }
 				}); 
-				
+
 		/* 		window.open("${ctx}/gamehomeinfo/gamehome/form"); */				        
         }
+		function tostoparom(romid){
+			if(window.confirm("确定停止该房间游戏？")){
+				window.location = "${ctx}/gamehomeinfo/gamehome/endredissave?roomid="+romid+"&rstaus=0";
+			}	
+		}        
 	</script>
 </head>
 <body>
@@ -64,7 +69,74 @@
 										<input type="checkbox" name="seleid" value="${gameroom.id}"/>
 									</td>
 									<td style="width: 80%" rowspan="2">
-										<a href="${ctx}/gamehomeinfo/gamehome/formr?id=${gameroom.id}" target="_blank" >
+										<c:if test="${gameroom.homestate==1}">
+										   <a href ="javascript:return false;" >
+											<ul>
+												<li style="list-style-type: none;opacity: 0.2;">
+													${gameroom.allpeo}人房间
+												</li>
+												<li style="list-style-type: none;opacity: 0.2;">
+													<c:if test="${gameroom.teamtype==0}">
+														自由组队
+													</c:if>
+													<c:if test="${gameroom.teamtype==1}">
+														随机组队
+													</c:if>
+												</li>												
+												<li style="list-style-type: none;opacity: 0.2;">
+													<c:if test="${gameroom.startinjur==0}">
+														友军伤害开启
+													</c:if>
+													<c:if test="${gameroom.startinjur==1}">
+														友军伤害关闭
+													</c:if>
+												</li>
+												<li style="list-style-type: none;opacity: 0.2;">
+													<c:if test="${gameroom.homestate==0}">
+														未进行游戏
+													</c:if>
+													<c:if test="${gameroom.homestate==1}">
+														已开始游戏
+													</c:if>
+												</li>												
+											</ul>
+										</a>
+										</c:if>	
+										
+										<c:if test="${gameroom.homestate==0}">
+										   <a href="${ctx}/gamehomeinfo/gamehome/formr?id=${gameroom.id}" target="_blank" >
+											<ul>
+												<li style="list-style-type: none;">
+													${gameroom.allpeo}人房间
+												</li>
+												<li style="list-style-type: none;">
+													<c:if test="${gameroom.teamtype==0}">
+														自由组队
+													</c:if>
+													<c:if test="${gameroom.teamtype==1}">
+														随机组队
+													</c:if>
+												</li>												
+												<li style="list-style-type: none;">
+													<c:if test="${gameroom.startinjur==0}">
+														友军伤害开启
+													</c:if>
+													<c:if test="${gameroom.startinjur==1}">
+														友军伤害关闭
+													</c:if>
+												</li>
+												<li style="list-style-type: none;o">
+													<c:if test="${gameroom.homestate==0}">
+														未进行游戏
+													</c:if>
+													<c:if test="${gameroom.homestate==1}">
+														已开始游戏
+													</c:if>
+												</li>												
+											</ul>
+										</a>
+										</c:if>																			
+										<%-- <a href="${ctx}/gamehomeinfo/gamehome/formr?id=${gameroom.id}" target="_blank" >
 											<ul>
 												<li style="list-style-type: none;">
 													${gameroom.allpeo}人房间
@@ -94,15 +166,21 @@
 													</c:if>
 												</li>												
 											</ul>
-										</a>
+										</a> --%>
 									</td>
 									<td style="width: 15%">
-									<input type="button" value="启动游戏" />
+									<input type="button" value="观战" />
 									</td>
 								</tr>
 								<tr>
 									<td style="width: 20%">
-										<input type="button" value="停止游戏" />
+									<c:if test="${gameroom.homestate=='0'}">
+										<input type="button" value="停止游戏" onclick="tostoparom('${gameroom.id}')" disabled="disabled" />
+									</c:if>
+									<c:if test="${gameroom.homestate=='1'}">
+										<input type="button" value="停止游戏" onclick="tostoparom('${gameroom.id}')" />
+									</c:if>																			
+<%-- 										<input type="button" value="停止游戏" onclick="tostoparom('${gameroom.id}')" /> --%>
 									</td>
 								</tr>
 							</table>
@@ -123,6 +201,6 @@
 		</table>	
 	</div>
 
-	<div class="pagination">${page}</div>
+	<div style="text-align: center;" class="pagination">${page}</div>
 </body>
 </html>

@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.csgame.modules.gameuserinfo.dao.gameuser.GuserinfoDao">
+    
+	<sql id="guserinfoColumns">
+		a.userid AS "userid",
+		a.username AS "username",
+		a.usex AS "usex",
+		a.uaddress AS "uaddress",
+		a.uavatimg AS "uavatimg",
+		a.uexpress AS "uexpress",
+		a.ugrade AS "ugrade",
+		a.ukull AS "ukull",
+		a.uattack AS "uattack",
+		a.uhp AS "uhp",
+		a.ustareon AS "ustareon",
+		a.ustaretw AS "ustaretw",
+		a.ustareth AS "ustareth",
+		a.ulastlogin AS "ulastlogin",
+		a.ulastip AS "ulastip",
+		a.uremarks1 AS "uremarks1",
+		a.uremarks2 AS "uremarks2"
+	</sql>
+	
+	<sql id="guserinfoJoins">
+	</sql>
+    
+	<select id="get" resultType="Guserinfo">
+		SELECT 
+			<include refid="guserinfoColumns"/>
+		FROM guserinfo a
+		<include refid="guserinfoJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="Guserinfo">
+		SELECT 
+			<include refid="guserinfoColumns"/>
+		FROM guserinfo a
+		<include refid="guserinfoJoins"/>
+		<where>
+			
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="Guserinfo">
+		SELECT 
+			<include refid="guserinfoColumns"/>
+		FROM guserinfo a
+		<include refid="guserinfoJoins"/>
+		<where>
+			
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO guserinfo(
+			userid,
+			username,
+			usex,
+			uaddress,
+			uavatimg,
+			uexpress,
+			ugrade,
+			ukull,
+			uattack,
+			uhp,
+			ustareon,
+			ustaretw,
+			ustareth,
+			ulastlogin,
+			ulastip,
+			uremarks1,
+			uremarks2
+		) VALUES (
+			#{userid},
+			#{username},
+			#{usex},
+			#{uaddress},
+			#{uavatimg},
+			#{uexpress},
+			#{ugrade},
+			#{ukull},
+			#{uattack},
+			#{uhp},
+			#{ustareon},
+			#{ustaretw},
+			#{ustareth},
+			#{ulastlogin},
+			#{ulastip},
+			#{uremarks1},
+			#{uremarks2}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE guserinfo SET 	
+			userid = #{userid},
+			username = #{username},
+			usex = #{usex},
+			uaddress = #{uaddress},
+			uavatimg = #{uavatimg},
+			uexpress = #{uexpress},
+			ugrade = #{ugrade},
+			ukull = #{ukull},
+			uattack = #{uattack},
+			uhp = #{uhp},
+			ustareon = #{ustareon},
+			ustaretw = #{ustaretw},
+			ustareth = #{ustareth},
+			ulastlogin = #{ulastlogin},
+			ulastip = #{ulastip},
+			uremarks1 = #{uremarks1},
+			uremarks2 = #{uremarks2}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		DELETE FROM guserinfo
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

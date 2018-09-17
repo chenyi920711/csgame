@@ -59,5 +59,9 @@ public class GamehomeService extends CrudService<GamehomeDao, Gamehome> {
 	public void settromm(Gamehome ma){
 		gamehome.settromm(ma);
 	}
-	
+
+	@Transactional(readOnly = false)
+	public void srthomestatus(Gamehome ma){
+		gamehome.srthomestatus(ma);
+	}	
 }

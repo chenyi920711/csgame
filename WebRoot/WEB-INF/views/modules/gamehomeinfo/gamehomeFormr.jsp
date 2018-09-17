@@ -37,12 +37,12 @@
  	<div style="color: white;background-color: #282C35;width: 100%;border-bottom: 1px solid white;">
  		<span style="color: white;font-size: 16px;">玩<br>家<br>列<br>表<br></span>
  	</div>
- 	<div style="color: white;background-color: #282C35;width: 100%;">
+<!--  	<div style="color: white;background-color: #282C35;width: 100%;">
  		<span style="color: white;font-size: 16px;">战<br>斗<br>日<br>志<br></span>
- 	</div>  	  
+ 	</div>   -->	  
 </div>
 <div class="button-group" id="thebutt" style="text-align: left;bottom: 1%;	">
-  <input type="button" id="polygon" class="button" value="开始游戏" style="margin-right: 15%;background-color: #282C35;" />
+  <input type="button" id="startgame" class="button" value="开始游戏" style="margin-right: 15%;background-color: #282C35;" onclick="gotostart()" />
   <input type="button" id="safegon" class="button" value="地图选择"  style="margin-right: 1%;background-color: #282C35;" onclick="chmap()" />
   <input type="button" id="ceeraingon" class="button" value="规则选择"  style="margin-right: 1%;background-color: #282C35;" onclick="chromset()" />
   <input type="button" id="checgetmap" class="button" value="返回"  style="margin-right: 1%;background-color: #282C35;" onclick="toreturn()" />
@@ -67,12 +67,13 @@
 		<input type="text" id="thesafec" />
 		<input type="text" id="thesafe" />
 		<input type="text" id="thegun" />
+		<input type="text" id="thestatus" value="${gamehome.homestate}" />
 	</div>
 <script type="text/javascript">
  var heig =  window.innerHeight;
 
  var widh =  window.innerWidth;
-var mapid = $("#mapid").val();
+ var mapid = $("#mapid").val();
 $.ajax({
 		url: "${ctx}/gamehomeinfo/gamehome/recshopmap",
    		type : 'POST', 
@@ -224,6 +225,41 @@ $.ajax({
 			    layer.closeAll();
 			  }
 			});	  	 		
+ 	}
+ 	
+ 	function gotostart(){
+ 		var mapid = $("#mapid").val();
+ 		var romid = $("#theromid").val();
+ 		if(mapid==""||mapid=="10000"){
+ 			alert("开始游戏前请先选择地图！");
+ 		}else if($("#thestatus").val()=="1"){
+ 			alert("游戏已经开始,请先在房间列表页面停止该游戏！");
+ 		}else{
+ 		if(window.confirm("设置完成,确定开始游戏？")){
+ 			//将初始地图信息存入redis->db0
+ 			var mapran = document.getElementById("themap").value;//地图
+ 			//安全区
+ 			var rang = document.getElementById("thesafec").value.split("#");
+	    	var ranen = rang[0];//半径
+	    	var ranws = rang[1];//圆心
+	    	//弹药点
+	    	var gunpoi = document.getElementById("thegun").value;
+	    	//生命点
+	    	var hppoi = document.getElementById("thesafe").value;
+			$.ajax({
+					url: "${ctx}/gamehomeinfo/gamehome/mapredissave",
+			   		type : 'POST', 
+					data : {"ranen" : ranen,"ranws":ranws,"mapran":mapran,"gunpoi":gunpoi,"hppoi":hppoi,"roomid":romid,"rstaus":"1"},
+					dataType : 'json', 
+					async:false,
+					success : function(){
+						window.location = "${ctx}/gamehomeinfo/gamehome/formrr?id="+romid;
+					}		
+			});	    	
+			window.location = "${ctx}/gamehomeinfo/gamehome/formrr?id="+romid;	  		
+ 		}
+
+ 		}
  	}
  	
  	function toreturn(){

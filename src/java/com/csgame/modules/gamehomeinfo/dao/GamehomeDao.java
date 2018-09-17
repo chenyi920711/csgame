@@ -20,4 +20,5 @@ public interface GamehomeDao extends CrudDao<Gamehome> {
 	
 	public void settmapid(Map<String, String> ma);
 	public void settromm(Gamehome ma);
+	public void srthomestatus(Gamehome ma);
 }
